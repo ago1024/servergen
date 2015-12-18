@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane fx:id="root" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.gotti.wurmunlimited.servergen.Controller">
+   <children>
+      <HBox>
+         <children>
+            <ImageView fx:id="mapRender" fitHeight="600.0" fitWidth="600.0" pickOnBounds="true" preserveRatio="true" />
+            <Accordion prefWidth="400.0">
+              <panes>
+                <TitledPane fx:id="mapSettings" animated="false" text="Map settings">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                           <children>
+                              <GridPane hgap="5.0" layoutX="18.6" layoutY="14.6" AnchorPane.leftAnchor="5.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="NEVER" minWidth="-Infinity" />
+                                  <ColumnConstraints hgrow="ALWAYS" maxWidth="236.0" minWidth="10.0" prefWidth="221.0" />
+                                    <ColumnConstraints hgrow="NEVER" maxWidth="-Infinity" minWidth="-Infinity" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                    <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label text="Map size" />
+                                    <Label text="Map seed" GridPane.rowIndex="1" />
+                                    <Label GridPane.rowIndex="3" />
+                                    <TextField fx:id="mapSeed" text="0" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" GridPane.rowIndex="1" />
+                                    <ComboBox fx:id="mapSize" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2" />
+                                    <HBox spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                                       <children>
+                                          <Button fx:id="generate" mnemonicParsing="false" onAction="#generate" text="Generate" />
+                                          <Button fx:id="reroll" mnemonicParsing="false" onAction="#reroll" text="Reroll" />
+                                       </children>
+                                    </HBox>
+                                    <Label text="Map name" GridPane.rowIndex="2" />
+                                    <TextField fx:id="mapName" text="Test" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                    <ProgressBar fx:id="progressBar" maxWidth="1.7976931348623157E308" progress="0.0" GridPane.columnSpan="3" GridPane.halignment="LEFT" GridPane.hgrow="ALWAYS" GridPane.rowIndex="4" />
+                                    <Label fx:id="progressMessage" maxWidth="1.7976931348623157E308" GridPane.columnSpan="3" GridPane.rowIndex="5" />
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#rollSeed" text="Roll" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <Button maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#rollName" text="Roll" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+                                    <Button fx:id="createZip" mnemonicParsing="false" onAction="#build" text="Create" GridPane.columnIndex="2" GridPane.rowIndex="7" />
+                                    <Label text="Zip name" GridPane.rowIndex="7" />
+                                    <TextField fx:id="zipName" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                    <TextField fx:id="zipFolder" text="maps" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="6" />
+                                    <Label text="Output folder" GridPane.rowIndex="6" />
+                                 </children>
+                              </GridPane>
+                           </children>
+                        </AnchorPane>
+                  </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Test map">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </TitledPane>
+                <TitledPane animated="false" text="Save map">
+                  <content>
+                    <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                  </content>
+                </TitledPane>
+              </panes>
+            </Accordion>
+         </children>
+      </HBox>
+   </children>
+</AnchorPane>

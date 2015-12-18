@@ -1,0 +1,3 @@
+[submodule "external/wu-terrain-gen"]
+	path = external/wu-terrain-gen
+	url = https://github.com/ago1024/wu-terrain-gen.git
