@@ -10,17 +10,22 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
+import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Random;
 
+import org.gotti.wurmunlimited.servergen.docker.DockerServer;
 import org.gotti.wurmunlimited.servergen.namegen.NameGenerator;
 import org.gotti.wurmunlimited.servergen.pack.ServerBuilder;
 
 import com.wyverngame.terraingenerator.Map;
 
+import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -72,6 +77,28 @@ public class Controller {
 	private Button createZip;
 	
 	@FXML
+	private TextField dockerArgs;
+	
+	@FXML
+	private TextField dockerBaseImage;
+	
+	@FXML
+	private TextField dockerImage;
+
+	@FXML
+	private TextField modDir;
+	
+	@FXML
+	private TextField dockerContainerArgs;
+	
+	@FXML
+	private Button dockerStart;
+
+	@FXML
+	private Button dockerStop;
+
+	
+	@FXML
 	private Pane root;
 	
 	private static final Integer[] mapSizes = { 512, 1024, 2048, 4096, 8192 };
@@ -79,6 +106,8 @@ public class Controller {
 	private ObjectProperty<Map> currentMap = new SimpleObjectProperty<>();
 	
 	private ObjectProperty<Path> currentMapArchive = new SimpleObjectProperty<>();
+	
+	private ObjectProperty<DockerServer> dockerServer = new SimpleObjectProperty<>();
 
 	private NameGenerator nameGen;
 
@@ -95,6 +124,10 @@ public class Controller {
 		
 		createZip.disableProperty().bind(currentMap.isNull());
 		createZip.textProperty().bind(Bindings.when(currentMapArchive.isNotNull()).then("Created").otherwise("Create"));
+		
+		dockerStart.disableProperty().bind(Bindings.or(currentMapArchive.isNull(), dockerServer.isNotNull()));
+		
+		dockerStop.disableProperty().bind(dockerServer.isNull());
 		
 		rollSeed();
 		rollName();
@@ -196,24 +229,70 @@ public class Controller {
 	
 	@FXML
 	protected void build(ActionEvent event) {
-		if (currentMap.get() != null) {
-			try {
-				Path zipFile = Paths.get(zipName.getText());
-				Files.createDirectories(zipFile.getParent());
-				URI uri = URI.create("jar:" + zipFile.toUri());
-	
-				HashMap<String, String> env = new HashMap<>();
-				env.put("create", "true");
-	
-				try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
-					new ServerBuilder(zipfs.getPath("/")).prepareServer(mapName.getText(), currentMap.get());
+		Task<Void> task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					root.disableProperty().set(true);
+					if (currentMap.get() != null) {
+						Path zipFile = Paths.get(zipName.getText());
+						Files.createDirectories(zipFile.getParent());
+						URI uri = URI.create("jar:" + zipFile.toUri());
+			
+						HashMap<String, String> env = new HashMap<>();
+						env.put("create", "true");
+			
+						try (FileSystem zipfs = FileSystems.newFileSystem(uri, env)) {
+							new ServerBuilder(zipfs.getPath("/")).prepareServer(mapName.getText(), currentMap.get());
+						}
+						
+						currentMap.set(null);
+						Platform.runLater(() -> currentMapArchive.set(zipFile));
+					}
+					return null;
+				} finally {
+					root.disableProperty().set(false);
 				}
-				
-				currentMap.set(null);
-				currentMapArchive.set(zipFile);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			} 
-		}
+			}
+		};
+		new Thread(task).start();
 	}
+	
+	@FXML
+	protected void dockerStart(ActionEvent event) {
+		Task<Void> task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					root.disableProperty().set(true);
+					final DockerServer server = new DockerServer(currentMapArchive.get(), Paths.get(modDir.getText()), dockerArgs.getText(), dockerBaseImage.getText(), dockerImage.getText(), mapName.getText(), dockerContainerArgs.getText());
+					server.build();
+					server.start();
+					dockerServer.set(server);
+					return null;
+				} finally {
+					root.disableProperty().set(false);
+				}
+			}
+		};
+		new Thread(task).start();
+	}
+	
+	@FXML
+	protected void dockerStop(ActionEvent event) {
+		Task<Void> task = new Task<Void>() {
+			@Override
+			protected Void call() throws Exception {
+				try {
+					root.disableProperty().set(true);
+					dockerServer.get().stop();
+					dockerServer.set(null);
+					return null;
+				} finally {
+					root.disableProperty().set(false);
+				}
+			}
+		};
+		new Thread(task).start();
+	}	
 }
